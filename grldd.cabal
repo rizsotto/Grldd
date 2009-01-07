@@ -1,0 +1,27 @@
+Name:        grldd
+Version:     0.2
+Synopsis:    Recursive dependency printing tool
+Description:
+        A simple recursive dependency printing tool for ELF objects.
+        Based on the GNU ldd command output. It generates graphviz dot
+	file as output.
+License:     GPL
+License-File: LICENSE
+Author:      Laszlo Nagy
+Maintainer:  rizsotto@gmail.com
+Category:    System
+Stability:   Experimental
+Build-type:  Simple
+Cabal-Version: >= 1.2
+
+Executable grldd
+        hs-source-dirs: Src
+        Main-Is:        Main.hs
+        other-modules:  Ldd
+
+        Build-Depends:  base >= 2.0,
+                        mtl,
+                        parsec,
+                        fgl,
+                        unix,
+                        process
