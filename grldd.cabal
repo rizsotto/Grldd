@@ -1,5 +1,5 @@
 Name:        grldd
-Version:     0.2
+Version:     0.2.1
 Synopsis:    Recursive dependency printing tool
 Description:
         A simple recursive dependency printing tool for ELF objects.
@@ -17,7 +17,7 @@ Cabal-Version: >= 1.2
 Executable grldd
         hs-source-dirs: Src
         Main-Is:        Main.hs
-        other-modules:  Ldd
+        other-modules:  Types Walker Ldd Ldd.Parser
 
         Build-Depends:  base >= 2.0,
                         mtl,

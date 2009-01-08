@@ -1,8 +1,10 @@
 module Ldd
-        ( SoInfo
-        , getDependencies
+        ( getDependencies
         , parsePath
         ) where
+
+import Types
+import Ldd.Parser
 
 import System.IO (hGetContents, hClose)
 import System.Exit (ExitCode(..))
@@ -12,10 +14,7 @@ import System.Process ( createProcess
                       , StdStream(..)
                       , waitForProcess)
 import System.Posix.Files (fileExist)
-import Text.ParserCombinators.Parsec
-import Control.Exception (throw, SomeException(..))
 
-type SoInfo = (String, FilePath)
 
 getDependencies :: FilePath -> IO [SoInfo]
 getDependencies fn = do
@@ -37,84 +36,3 @@ getDependencies fn = do
     where
         empty :: SoInfo -> Bool
         empty (name, path) = (name == "") || (path == "")
-
--- parse ldd output
---    statically linked
---    path (address)
---    name => path (address)
---    name => (address)
-
-hexadecimal :: Parser ()
-hexadecimal = do { char '0'
-                 ; char 'x'
-                 ; many1 hexDigit
-                 ; return () }
-
-address :: Parser ()
-address = do { char '('
-             ; hexadecimal
-             ; char ')'
-             ; return () }
-
-filechar :: Parser Char
-filechar = alphaNum <|> oneOf ".,_-+"
-
-filename :: Parser String
-filename = many1 filechar
-
-separator :: Parser Char
-separator = char '/'
-
-path :: Parser String
-path = do { separator
-          ; f <- sepBy filename separator
-          ; return $ foldr (\w res -> '/' : w ++ res) "" f }
-
-arrow :: Parser ()
-arrow = do { spaces
-           ; string "=>"
-           ; spaces
-           ; return () }
-
-entry :: Parser SoInfo
-entry =   do { string "statically linked"
-             ; return ("", "") }
-        <|>
-          do { p <- try path 
-             ; spaces
-             ; address
-             ; return ("", p) }
-        <|>
-          do { n <- filename
-             ; arrow
-             ; do { p <- try path
-                  ; spaces
-                  ; address
-                  ; return (n, p) }
-               <|> do { address
-                      ; return (n, "") }}
-
-line :: Parser SoInfo
-line = do { spaces
-          ; e <- entry
-          ; return e }
-        <|> return ("", "")
-
-eol = char '\n'
-ldd = sepBy line eol
-
-parseLdd :: String -> String -> Either ParseError [SoInfo]
-parseLdd file = parse ldd ("(ldd output on " ++ file ++ ")")
-
-
-path' :: Parser String
-path' = do { separator
-           ; f <- sepBy filename separator
-           ; return $ last f }
-
-parsePath :: String -> String
-parsePath = do
-        result <- parse path' ""
-        case result of
-            Right p -> return p
-            Left _  -> fail "Wrong file name: "
