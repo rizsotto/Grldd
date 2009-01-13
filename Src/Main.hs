@@ -2,7 +2,7 @@ module Main where
 
 import Types
 import Ldd
-import Walker
+import Graph
 
 import Control.Exception
 import Data.Graph.Inductive.Graphviz (graphviz')
@@ -41,7 +41,7 @@ main = do
                         (opts, files, [])      -> help
                         (_,_,errs)             -> die errs
 
-    parse argv = getOpt Permute options argv
+    parse      = getOpt Permute options
     header     = "Usage: grldd [-h] [file ...]"
     info       = usageInfo header options
     dump       = hPutStrLn stderr

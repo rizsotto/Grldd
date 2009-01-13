@@ -1,4 +1,4 @@
-module Walker
+module Graph
         ( execApp
         , makeDeps
         , createGraphFromState 
@@ -8,6 +8,7 @@ import Types
 import Ldd
 
 import Control.Monad.State (get, put, liftIO, execStateT, StateT)
+import Control.Monad (when)
 import Data.List (union, elemIndex)
 
 import qualified Data.Graph.Inductive.Graph as Graph (mkGraph)
@@ -29,15 +30,13 @@ execApp ns g =
 makeDeps :: Int -> App ()
 makeDeps depth = do
     st <- get
-    let so@(_, path) = (nodes st) !! depth
+    let so@(_, path) = nodes st !! depth
     deps <- liftIO $ getDependencies path
     let nodes' = union (nodes st) deps
         edges' = union (map (\x -> (so,x)) deps) (edges st)
         depth' = depth + 1
     put st {nodes = nodes', edges = edges'}
-    if (depth' < length nodes')
-        then makeDeps depth'
-        else return ()
+    when (depth' < length nodes') $ makeDeps depth'
 
 
 type DepGraph = Data.Graph.Inductive.PatriciaTree.Gr String ()
