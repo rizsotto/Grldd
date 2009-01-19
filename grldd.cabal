@@ -19,9 +19,16 @@ Executable grldd
         Main-Is:        Main.hs
         other-modules:  Types Graph Ldd Ldd.Parser
 
-        Build-Depends:  base >= 2.0,
+        Build-Depends:  base,
                         mtl,
                         parsec,
-                        fgl,
                         unix,
+                        fgl,
                         process
+
+Executable unit-test
+        Buildable:      False
+        hs-source-dirs: Src Test
+        Main-Is:        Test.hs
+        other-modules:  ParserTest
+        Build-Depends:  HUnit

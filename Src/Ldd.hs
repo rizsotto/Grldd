@@ -29,10 +29,7 @@ getDependencies fn = do
                         exit <- waitForProcess pid
                         hClose outh
                         case exit of
-                            ExitSuccess -> return $ filter (not . empty) result
+                            ExitSuccess -> return $ filter (not . isEmpty) result
                             _           -> fail "Problem with execute ldd."
                     Left err -> fail ("Internal error!\n" ++ show err)
             else fail ("File is not exist: " ++ fn)
-    where
-        empty :: SoInfo -> Bool
-        empty (name, path) = (name == "") || (path == "")
