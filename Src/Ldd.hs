@@ -26,12 +26,13 @@ getDependencies fn = do
                     createProcess (proc "ldd" [fn])
                         { std_out = CreatePipe, std_err = CreatePipe }
                 out <- hGetContents outh
-                case parseLdd fn out of
-                    Right result -> do
-                        exit <- waitForProcess pid
-                        hClose outh
-                        case exit of
-                            ExitSuccess -> return $ filter (not . isEmpty) result
-                            _           -> fail "Problem with execute ldd."
-                    Left err -> fail ("Internal error: " ++ show err)
+                exit <- waitForProcess pid
+                hClose errh
+                case exit of
+                    ExitSuccess -> case parseLdd fn out of
+                        Right result -> do
+                                  hClose outh
+                                  return $ filter (not . isEmpty) result
+                        Left err -> fail ("Internal error: " ++ show err)
+                    _ -> fail "Problem with execute ldd."
             else fail ("File is not exist: " ++ fn)
