@@ -55,9 +55,30 @@ nameTest = TestCase (assertEmpty result)
     where
         result   = parseLdd "" "\tliba.so.8 => (0xaa)"
 
+realTest :: Test
+realTest = TestCase (assertSoInfo expected result)
+    where
+        expected = [ empty,
+                    ("libdl.so.2", "/lib/libdl.so.2"),
+                    ("libc.so.6", "/lib/libc.so.6"),
+                     empty ]
+        result   = parseLdd ""
+                    ("\tlinux-gate.so.1 =>  (0xb7f17000)\n" ++
+                     "\tlibdl.so.2 => /lib/libdl.so.2 (0xb7ef4000)\n" ++
+                     "\tlibc.so.6 => /lib/libc.so.6 (0xb7d96000)\n" ++
+                     "\t/lib/ld-linux.so.2 (0xb7f18000)")
+
+filenameTest :: Test
+filenameTest = TestCase (assertEqual "basename" expected result)
+    where
+        expected = "libpam.so.0"
+        result = parsePath "/lib/libpam.so.0"
+
 tests :: Test
 tests = TestList [ emptyTest
                  , staticTest
                  , normalTest
                  , pathTest
-                 , nameTest ]
+                 , nameTest
+                 , realTest
+                 , filenameTest ]

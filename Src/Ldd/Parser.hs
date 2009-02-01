@@ -47,12 +47,12 @@ arrow = do { spaces
 
 entry :: Parser SoInfo
 entry =   do { string "statically linked"
-             ; return ("", "") }
+             ; return empty }
         <|>
           do { p <- try path 
              ; spaces
              ; address
-             ; return ("", p) }
+             ; return empty }
         <|>
           do { n <- filename
              ; arrow
@@ -61,7 +61,7 @@ entry =   do { string "statically linked"
                   ; address
                   ; return (n, p) }
                <|> do { address
-                      ; return (n, "") }}
+                      ; return empty }}
 
 line :: Parser SoInfo
 line = do { spaces
