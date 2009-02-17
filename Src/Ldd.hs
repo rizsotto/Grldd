@@ -1,5 +1,6 @@
 module Ldd
-        ( getDependencies
+        ( Dependency(..)
+        , getDependencies
         , parsePath
         ) where
 
@@ -16,6 +17,20 @@ import System.Process ( createProcess
                       , waitForProcess)
 import System.Posix.Files (fileExist)
 
+{-
+type Package = String
+
+class Monad m => SharedObject m where
+    getDependencies :: FilePath -> m Maybe [FilePath]
+    getPackage      :: FilePath -> m Maybe Package
+-}
+
+class Monad m => Dependency m where
+    resolve :: FilePath -> m [SoInfo]
+
+
+instance Dependency IO where
+    resolve = getDependencies 
 
 getDependencies :: FilePath -> IO [SoInfo]
 getDependencies fn = do

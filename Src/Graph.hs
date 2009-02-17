@@ -1,5 +1,5 @@
 module Graph
-        ( execApp
+        ( makeState
         , makeDeps
         , createGraphFromState 
         ) where
@@ -7,7 +7,7 @@ module Graph
 import Types
 import Ldd
 
-import Control.Monad.State (get, put, liftIO, execStateT, StateT)
+import Control.Monad.State (get, put, lift, execStateT, StateT)
 import Control.Monad (when)
 import Data.List (union, elemIndex)
 
@@ -22,16 +22,19 @@ data AppState = AppState { nodes :: [SoInfo]
 type App = StateT AppState IO
 
 
-execApp :: [SoInfo] -> App a -> IO (AppState)
-execApp ns g =
-        let state = AppState {nodes = ns, edges = []}
-        in execStateT g state
+makeState :: [SoInfo] -> IO (AppState)
+makeState inputs =
+        let state = AppState {nodes = inputs, edges = []}
+        in execStateT (makeDependencies 0) state
 
-makeDeps :: Int -> App ()
+makeDependencies :: Int -> App ()
+makeDependencies = makeDeps
+
+makeDeps :: Dependency m => Int -> StateT AppState m ()
 makeDeps depth = do
     st <- get
     let so@(_, path) = nodes st !! depth
-    deps <- liftIO $ getDependencies path
+    deps <- lift $ resolve path
     let nodes' = union (nodes st) deps
         edges' = union (map (\x -> (so,x)) deps) (edges st)
         depth' = depth + 1

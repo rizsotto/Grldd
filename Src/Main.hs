@@ -23,7 +23,7 @@ options = [ Option ['h'] ["help"] (NoArg Help) "Show this help message" ]
 main = do
     files <- parseArgs
     handle handler
-           (do s <- execApp (mkInfo files) (makeDeps 0)
+           (do s <- makeState $ mkInfo files
                putStrLn $ graphviz' $ createGraphFromState s )
   where
     mkInfo :: [String] -> [SoInfo]
