@@ -1,13 +1,15 @@
+{- LANGUAGE FlexibleContext, GeneralizedNewtypeDeriving, FunctionalDependencies, MultiParamTypeClasses, TypeSynonymInstances -}
 module Graph
-        ( makeState
-        , makeDeps
-        , createGraphFromState 
+        ( SoGraph(..)
+        , makeGraph
+        , makeGraphIO
+        , makeFgl
         ) where
 
-import Types
 import Ldd
 
-import Control.Monad.State (get, put, lift, execStateT, StateT)
+import Control.Monad.State (get, put, lift, execStateT, runStateT, StateT)
+import Control.Monad.Error
 import Control.Monad (when)
 import Data.List (union, elemIndex)
 
@@ -16,41 +18,58 @@ import Data.Graph.Inductive.PatriciaTree (Gr)
 
 
 
-data AppState = AppState { nodes :: [SoInfo]
-                         , edges :: [(SoInfo, SoInfo)] }
+data SoGraph = SoGraph { nodes_    :: [FilePath]
+                       , edges_    :: [(FilePath, FilePath)]
+                       , packages_ :: [(Package, FilePath)]}
 
-type App = StateT AppState IO
 
-
-makeState :: [SoInfo] -> IO (AppState)
-makeState inputs =
-        let state = AppState {nodes = inputs, edges = []}
-        in execStateT (makeDependencies 0) state
-
-makeDependencies :: Int -> App ()
-makeDependencies = makeDeps
-
-makeDeps :: Dependency m => Int -> StateT AppState m ()
-makeDeps depth = do
-    st <- get
-    let so@(_, path) = nodes st !! depth
-    deps <- lift $ resolve path
-    let nodes' = union (nodes st) deps
-        edges' = union (map (\x -> (so,x)) deps) (edges st)
+createGraph :: SharedObject m => Int -> ErrorT Message (StateT SoGraph m) ()
+createGraph depth = do
+    st <- lift get
+    let current = nodes_ st !! depth
         depth' = depth + 1
-    put st {nodes = nodes', edges = edges'}
-    when (depth' < length nodes') $ makeDeps depth'
+    deps <- lift $ lift $ getDependencies current
+    pkg <- lift $ lift $ getPackage current
+    case deps of
+        Right list -> do
+            let nodes' = union (nodes_ st) list
+                edges' = union (map (\x -> (current,x)) list) (edges_ st)
+                pkgs' = case pkg of
+                    Nothing -> packages_ st
+                    Just p  -> (p, current):(packages_ st)
+            lift $ put st {nodes_ = nodes', edges_ = edges'}
+            when (depth' < length nodes') $ createGraph depth'
+        Left msg -> throwError msg
+
+makeGraph :: (SharedObject m) => [FilePath] -> m (Either Message SoGraph)
+makeGraph inputs = do
+    result <- runSharedObject inputs
+    case result of
+        (Left err, _) -> return $ Left err
+        (Right _, gr) -> return $ Right gr
+  where
+    runSharedObject inputs =
+         let state = SoGraph {nodes_ = inputs, edges_ = [], packages_ = []}
+         in runStateT (runErrorT (createGraph 0)) state
+                
+{-
+createGraphIO :: Int -> ErrorT Message (StateT SoGraph IO) ()
+createGraphIO = createGraph
+-}
+
+makeGraphIO :: [FilePath] -> IO (Either Message SoGraph)
+makeGraphIO = makeGraph
 
 
 type DepGraph = Data.Graph.Inductive.PatriciaTree.Gr String ()
 
-createGraphFromState :: AppState -> DepGraph
-createGraphFromState st =
-    let nodes' = nodes st
-        edges' = edges st
+makeFgl :: SoGraph -> DepGraph
+makeFgl gr =
+    let nodes' = nodes_ gr
+        edges' = edges_ gr
     in Graph.mkGraph (mkNodes nodes') (mkEdges nodes' edges')
   where
-    mkNodes = zip [0..] . map fst
+    mkNodes = zip [0..]
     mkEdges nodes =
              map (\(from, to) -> ((index nodes from), (index nodes to), ()))
     index es e = case elemIndex e es of

@@ -3,8 +3,6 @@ module Ldd.Parser
         , parsePath
         ) where
 
-import Types
-
 import Text.ParserCombinators.Parsec
 
 -- parse ldd output
@@ -45,34 +43,35 @@ arrow = do { spaces
            ; spaces
            ; return () }
 
-entry :: Parser SoInfo
+entry :: Parser FilePath
 entry =   do { string "statically linked"
-             ; return empty }
+              ; return ""}
         <|>
           do { p <- try path 
              ; spaces
              ; address
-             ; return empty }
+             ; return ""}
         <|>
           do { n <- filename
              ; arrow
              ; do { p <- try path
                   ; spaces
                   ; address
-                  ; return (n, p) }
+                  ; return p }
                <|> do { address
-                      ; return empty }}
+                      ; return ""}}
 
-line :: Parser SoInfo
+line :: Parser FilePath
 line = do { spaces
-          ; e <- entry
-          ; return e }
-        <|> return ("", "")
+           ; e <- entry
+           ; return e }
+        <|> return ""
 
 eol = char '\n'
+
 ldd = sepBy line eol
 
-parseLdd :: String -> String -> Either ParseError [SoInfo]
+parseLdd :: String -> String -> Either ParseError [FilePath]
 parseLdd file = parse ldd ("(ldd output on " ++ file ++ ")")
 
 

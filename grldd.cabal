@@ -17,7 +17,7 @@ Cabal-Version: >= 1.2
 Executable grldd
         hs-source-dirs: Src
         Main-Is:        Main.hs
-        other-modules:  Types Graph Ldd Ldd.Parser
+        other-modules:  Graph Ldd Ldd.Parser
 
         Build-Depends:  base,
                         mtl,

@@ -1,6 +1,5 @@
 module Main where
 
-import Types
 import Ldd
 import Graph
 
@@ -18,17 +17,15 @@ data Flag = Help
 options :: [OptDescr Flag]
 options = [ Option ['h'] ["help"] (NoArg Help) "Show this help message" ]
 
-
+reportResult :: Either Message SoGraph -> IO ()
+reportResult (Left e) = putStrLn ("grldd failed with error: " ++ show e)
+reportResult (Right g) = putStrLn $ graphviz' $ makeFgl g
 
 main = do
     files <- parseArgs
-    handle handler
-           (do s <- makeState $ mkInfo files
-               putStrLn $ graphviz' $ createGraphFromState s )
+    r <- makeGraphIO files
+    reportResult r
   where
-    mkInfo :: [String] -> [SoInfo]
-    mkInfo = map (\x -> (parsePath x, x))
-
     handler :: SomeException -> IO ()
     handler e = dump (show e) >> exitWith (ExitFailure 1)
 
