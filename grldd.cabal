@@ -1,5 +1,5 @@
 Name:        grldd
-Version:     0.3.0
+Version:     0.3.1
 Synopsis:    Recursive dependency printing tool
 Description:
         A simple recursive dependency printing tool for ELF objects.
@@ -27,8 +27,9 @@ Executable grldd
                         process
 
 Executable unit-test
-        Buildable:      False
+        --Buildable:      False
         hs-source-dirs: Src Test
         Main-Is:        Test.hs
-        other-modules:  ParserTest
+        other-modules:  GraphTest ParserTest 
         Build-Depends:  HUnit
+        extensions:     TypeSynonymInstances

@@ -19,30 +19,32 @@ import Data.Graph.Inductive.PatriciaTree (Gr)
 import Data.Graph.Inductive.Graphviz (graphviz')
 
 
-data SoGraph = SoGraph { nodes_    :: [FilePath]
-                       , edges_    :: [(FilePath, FilePath)]
-                       , packages_ :: [(Package, FilePath)]}
+data SoGraph = SoGraph { nodes    :: [FilePath]
+                       , edges    :: [(FilePath, FilePath)]
+                       , packages :: [(FilePath, Package)] }
+	deriving (Eq, Show)
 
 
 createGraph :: SharedObject m => Int -> ErrorT Message (StateT SoGraph m) ()
 createGraph depth = do
     st <- lift get
-    let current = nodes_ st !! depth
+    let current = nodes st !! depth
         depth' = depth + 1
     deps <- lift $ lift $ getDependencies current
     pkg <- lift $ lift $ getPackage current
     case deps of
         Right list -> do
-            let nodes' = union (nodes_ st) list
-                edges' = union (map (\x -> (current,x)) list) (edges_ st)
+            let nodes' = union (nodes st) list
+                edges' = union (map (\x -> (current,x)) list) (edges st)
                 pkgs' = case pkg of
-                    Nothing -> packages_ st
-                    Just p  -> (p, current):(packages_ st)
-            lift $ put st {nodes_ = nodes', edges_ = edges'}
+                    Nothing -> packages st
+                    Just p  -> (current, p):(packages st)
+            lift $ put st {nodes = nodes', edges = edges', packages = pkgs'}
             when (depth' < length nodes') $ createGraph depth'
         Left msg -> throwError msg
 
 makeGraph :: (SharedObject m) => [FilePath] -> m (Either Message SoGraph)
+makeGraph [] = return $ Left "No input were given."
 makeGraph inputs = do
     result <- runSharedObject inputs
     case result of
@@ -50,7 +52,7 @@ makeGraph inputs = do
         (Right _, gr) -> return $ Right gr
   where
     runSharedObject inputs =
-         let state = SoGraph {nodes_ = inputs, edges_ = [], packages_ = []}
+         let state = SoGraph {nodes = inputs, edges = [], packages = []}
          in runStateT (runErrorT (createGraph 0)) state
                 
 makeGraphIO :: [FilePath] -> IO (Either Message SoGraph)
@@ -61,8 +63,8 @@ type DepGraph = Data.Graph.Inductive.PatriciaTree.Gr String ()
 
 makeFgl :: SoGraph -> DepGraph
 makeFgl gr =
-    let nodes' = nodes_ gr
-        edges' = edges_ gr
+    let nodes' = nodes gr
+        edges' = edges gr
     in Graph.mkGraph (mkNodes nodes') (mkEdges nodes' edges')
   where
     mkNodes = zip [0..]

@@ -1,8 +1,10 @@
 module Main where
 
-import ParserTest
+import ParserTest (tests)
+import GraphTest  (tests)
 
-import Test.HUnit
+import Test.HUnit (runTestTT)
 
 main = do
         runTestTT $ ParserTest.tests
+        runTestTT $ GraphTest.tests
