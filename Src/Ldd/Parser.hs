@@ -1,6 +1,5 @@
 module Ldd.Parser
         ( parseLdd
-        , parsePath
         ) where
 
 import Text.ParserCombinators.Parsec
@@ -73,16 +72,3 @@ ldd = sepBy line eol
 
 parseLdd :: String -> String -> Either ParseError [FilePath]
 parseLdd file = parse ldd ("(ldd output on " ++ file ++ ")")
-
-
-path' :: Parser String
-path' = do { separator
-           ; f <- sepBy filename separator
-           ; return $ last f }
-
-parsePath :: String -> String
-parsePath = do
-        result <- parse path' ""
-        case result of
-            Right p -> return p
-            Left _  -> fail "Wrong file name: "

@@ -1,7 +1,6 @@
 {- LANGUAGE GeneralizedNewtypeDeriving, FunctionalDependencies, MultiParamTypeClasses, TypeSynonymInstances -}
 module Ldd
-        ( parsePath
-        , SharedObject(..)
+        ( SharedObject(..)
         , Package
         , Message
         ) where
@@ -31,7 +30,7 @@ getDependencies' fn = do
         exit <- waitForProcess pid
         case exit of
             ExitSuccess -> case parseLdd fn out of
-                Right result -> return $ Right $ filter (\x -> x /= "") result
+                Right result -> return $ Right $ filter (not . null) result
                 Left e -> return $ Left ("Internal error: " ++ show e)
             _ -> return $ Left err
 

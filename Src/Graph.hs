@@ -4,6 +4,7 @@ module Graph
         , makeGraph
         , makeGraphIO
         , makeFgl
+        , printGraph
         ) where
 
 import Ldd
@@ -15,7 +16,7 @@ import Data.List (union, elemIndex)
 
 import qualified Data.Graph.Inductive.Graph as Graph (mkGraph)
 import Data.Graph.Inductive.PatriciaTree (Gr)
-
+import Data.Graph.Inductive.Graphviz (graphviz')
 
 
 data SoGraph = SoGraph { nodes_    :: [FilePath]
@@ -52,11 +53,6 @@ makeGraph inputs = do
          let state = SoGraph {nodes_ = inputs, edges_ = [], packages_ = []}
          in runStateT (runErrorT (createGraph 0)) state
                 
-{-
-createGraphIO :: Int -> ErrorT Message (StateT SoGraph IO) ()
-createGraphIO = createGraph
--}
-
 makeGraphIO :: [FilePath] -> IO (Either Message SoGraph)
 makeGraphIO = makeGraph
 
@@ -75,3 +71,6 @@ makeFgl gr =
     index es e = case elemIndex e es of
              Nothing -> error "never get here"
              Just x  -> x
+
+printGraph :: SoGraph -> String
+printGraph = graphviz' . makeFgl
