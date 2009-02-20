@@ -13,11 +13,16 @@ data Flag = Help
   deriving Eq
 
 options :: [OptDescr Flag]
-options = [ Option ['h'] ["help"] (NoArg Help) "Show this help message" ]
+options = [Option ['h'] ["help"] (NoArg Help) "Show this help message"]
 
 
 main = do
-    files <- parseArgs
+    handle
+        (\(e :: IOException) -> do 
+                dump ("grldd: failed " ++ show e)
+                exitWith (ExitFailure 1))
+        (parseArgs >>= inspect >>= printGraph' >> exitWith ExitSuccess)
+{-
     r <- makeGraphIO files
     case r of
         Left e -> do
@@ -26,6 +31,7 @@ main = do
         Right g -> do
                         putStrLn $ printGraph g
                         exitWith ExitSuccess
+-}
   where
     parseArgs :: IO ([String])
     parseArgs = do
