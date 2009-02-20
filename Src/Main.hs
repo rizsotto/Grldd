@@ -21,17 +21,7 @@ main = do
         (\(e :: IOException) -> do 
                 dump ("grldd: failed " ++ show e)
                 exitWith (ExitFailure 1))
-        (parseArgs >>= inspect >>= printGraph' >> exitWith ExitSuccess)
-{-
-    r <- makeGraphIO files
-    case r of
-        Left e -> do
-                        dump ("grldd: failed " ++ e)
-                        exitWith (ExitFailure 1)
-        Right g -> do
-                        putStrLn $ printGraph g
-                        exitWith ExitSuccess
--}
+        (parseArgs >>= inspect >>= print' >> exitWith ExitSuccess)
   where
     parseArgs :: IO ([String])
     parseArgs = do

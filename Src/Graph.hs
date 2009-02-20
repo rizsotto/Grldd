@@ -1,11 +1,13 @@
 {- LANGUAGE ScopedTypeVariables -}
 module Graph
-        ( inspect
-        , makeGraph'
-        , printGraph'
+        ( bfsM
+        , inspect
+        , mkGraph'
+        , print'
         ) where
 
 import Ldd
+import Dpkg
 
 import qualified Data.Graph.Inductive.Graph as Graph
 import Data.Graph.Inductive.PatriciaTree (Gr)
@@ -38,8 +40,8 @@ inspect fns = bfsM getInfo M.empty fns
 
 type DepGraph = Data.Graph.Inductive.PatriciaTree.Gr String ()
 
-makeGraph' :: DepInfo -> DepGraph
-makeGraph' deps =
+mkGraph' :: DepInfo -> DepGraph
+mkGraph' deps =
     if M.null deps
         then Graph.empty 
         else Graph.mkGraph nodes edges
@@ -50,5 +52,5 @@ makeGraph' deps =
                                (M.findIndex dep deps),
                                ())) v) ++ acc) [] deps
 
-printGraph' :: DepInfo -> IO ()
-printGraph' = putStrLn . graphviz' . makeGraph'
+print' :: DepInfo -> IO ()
+print' = putStrLn . graphviz' . mkGraph'

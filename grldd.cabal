@@ -18,7 +18,7 @@ Executable grldd
         extensions:     ScopedTypeVariables
         hs-source-dirs: Src
         Main-Is:        Main.hs
-        other-modules:  Graph Ldd Ldd.Parser
+        other-modules:  Graph Ldd Dpkg
 
         Build-Depends:  base,
                         mtl,
