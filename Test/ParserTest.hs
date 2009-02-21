@@ -8,6 +8,7 @@ import Control.Monad (unless)
 import Test.HUnit
 
 
+---------- test fixtures
 tsrc :: String
 tsrc = "test source"
 
@@ -19,7 +20,6 @@ assertEmpty value = case value of
   where
     message x = "Expected empty, but got: "++ show x ++ "\n"
 
-
 assertSoInfo :: [FilePath] -> Either ParseError [FilePath] -> Assertion
 assertSoInfo expected actual = case actual of
     Right x -> unless (x == expected) (assertFailure $ message x)
@@ -27,6 +27,7 @@ assertSoInfo expected actual = case actual of
   where
     message x = "Expected: " ++ show expected ++ ", but got: "++ show x ++ "\n"
 
+---------- test cases
 emptyTest :: Test
 emptyTest = TestCase (assertEmpty result)
     where

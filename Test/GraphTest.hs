@@ -8,6 +8,8 @@ import qualified Data.Map as M
 
 import Test.HUnit
 
+
+---------- test fixtures 
 type TestVector = ([(Integer, ([Integer], String))])
 type TestSupply = Reader TestVector
 
@@ -22,7 +24,7 @@ runTest :: TestVector -> [Integer] -> Map Integer String
 runTest tv starts = runReader (bfsM getDependencies M.empty starts) tv
 
 
-
+---------- test cases
 empty = TestCase (assertEqual "" expected result)
   where
     tv = []

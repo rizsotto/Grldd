@@ -9,7 +9,7 @@ import System.Exit (ExitCode(..))
 import System.Process
 import Text.ParserCombinators.Parsec
 
-
+---------- dependency lookup with exec ldd
 getDependencies :: FilePath -> IO ([FilePath])
 getDependencies fn = do
         (_, Just outh, Just errh, pid) <-
@@ -24,7 +24,10 @@ getDependencies fn = do
                 Left e -> fail ("Internal error: " ++ show e)
             _ -> fail err
 
--- parse ldd output
+---------- parse ldd output
+--
+-- possible output of successful running
+--
 --    statically linked
 --    path (address)
 --    name => path (address)
