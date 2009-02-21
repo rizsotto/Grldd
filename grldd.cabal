@@ -16,6 +16,7 @@ Cabal-Version: >= 1.2
 
 Executable grldd
         extensions:     ScopedTypeVariables
+        ghc-options:    -O2
         hs-source-dirs: Src
         Main-Is:        Main.hs
         other-modules:  Graph Ldd Dpkg
@@ -29,7 +30,7 @@ Executable grldd
                         containers
 
 Executable unit-test
-        --Buildable:      False
+        Buildable:      False
         hs-source-dirs: Src Test
         Main-Is:        Test.hs
         other-modules:  GraphTest ParserTest 
