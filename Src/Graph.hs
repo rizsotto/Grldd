@@ -1,6 +1,8 @@
 {- LANGUAGE ScopedTypeVariables -}
 module Graph
-        ( bfsM
+        ( Moves
+        , Map
+        , bfsM
         , inspect
         , mkGraph'
         , print'

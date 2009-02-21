@@ -10,6 +10,20 @@ import System.Process
 import Text.ParserCombinators.Parsec
 
 
+getDependencies :: FilePath -> IO ([FilePath])
+getDependencies fn = do
+        (_, Just outh, Just errh, pid) <-
+            createProcess (proc "ldd" [fn]) { std_out = CreatePipe
+                                            , std_err = CreatePipe }
+        out <- hGetContents outh
+        err <- hGetContents errh
+        exit <- waitForProcess pid
+        case exit of
+            ExitSuccess -> case parse' fn out of
+                Right result -> return $ filter (not . null) result
+                Left e -> fail ("Internal error: " ++ show e)
+            _ -> fail err
+
 -- parse ldd output
 --    statically linked
 --    path (address)
@@ -78,18 +92,3 @@ ldd = sepBy line eol
 
 parse' :: String -> String -> Either ParseError [FilePath]
 parse' file = parse ldd ("(ldd output on " ++ file ++ ")")
-
-
-getDependencies :: FilePath -> IO ([FilePath])
-getDependencies fn = do
-        (_, Just outh, Just errh, pid) <-
-            createProcess (proc "ldd" [fn]) { std_out = CreatePipe
-                                            , std_err = CreatePipe }
-        out <- hGetContents outh
-        err <- hGetContents errh
-        exit <- waitForProcess pid
-        case exit of
-            ExitSuccess -> case parse' fn out of
-                Right result -> return $ filter (not . null) result
-                Left e -> fail ("Internal error: " ++ show e)
-            _ -> fail err
