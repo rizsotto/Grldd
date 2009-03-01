@@ -3,7 +3,6 @@ module GraphTest (tests) where
 import Graph
 
 import Control.Monad.Reader
-import Control.Monad.Identity
 import qualified Data.Map as M
 
 import Test.HUnit
