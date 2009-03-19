@@ -37,13 +37,15 @@ hexadecimal :: Parser ()
 hexadecimal = do { char '0'
                  ; char 'x'
                  ; many1 hexDigit
-                 ; return () }
+                 ; return ()
+                 }
 
 address :: Parser ()
 address = do { char '('
              ; hexadecimal
              ; char ')'
-             ; return () }
+             ; return ()
+             }
 
 filechar :: Parser Char
 filechar = alphaNum <|> oneOf ".,_-+"
@@ -57,37 +59,45 @@ separator = char '/'
 path :: Parser String
 path = do { separator
           ; f <- sepBy filename separator
-          ; return $ foldr (\w res -> '/' : w ++ res) "" f }
+          ; return $ foldr (\w res -> '/' : w ++ res) "" f
+          }
 
 arrow :: Parser ()
 arrow = do { spaces
            ; string "=>"
            ; spaces
-           ; return () }
+           ; return ()
+           }
 
 entry :: Parser FilePath
 entry =   do { string "statically linked"
-              ; return ""}
+             ; return ""
+             }
         <|>
           do { p <- try path 
              ; spaces
              ; address
-             ; return ""}
+             ; return ""
+             }
         <|>
           do { n <- filename
              ; arrow
              ; do { p <- try path
                   ; spaces
                   ; address
-                  ; return p }
+                  ; return p
+                  }
                <|> do { address
-                      ; return ""}}
+                      ; return ""
+                      }
+             }
 
 line :: Parser FilePath
 line = do { spaces
-           ; e <- entry
-           ; return e }
-        <|> return ""
+          ; e <- entry
+          ; return e
+          }
+       <|> return ""
 
 eol = char '\n'
 

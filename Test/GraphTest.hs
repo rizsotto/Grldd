@@ -24,25 +24,32 @@ runTest tv starts = runReader (bfsM getDependencies M.empty starts) tv
 
 
 ---------- test cases
-empty = TestCase (assertEqual "" expected result)
+emptyTest = TestCase (assertEqual "" expected result)
   where
     tv = []
     expected = M.fromList tv
     result = runTest tv []
 
-noArg = TestCase (assertEqual "" expected result)
+noArgTest = TestCase (assertEqual "" expected result)
   where
     tv = [(1, ([],"a"))]
     expected = M.fromList []
     result = runTest tv []
 
-single = TestCase (assertEqual "" expected result)
+singleTest = TestCase (assertEqual "" expected result)
   where
     tv = [(1, ([],"a"))]
     expected = M.fromList tv
     result = runTest tv [1]
 
-simple = TestCase (assertEqual "" expected result)
+noRouteTest = TestCase (assertEqual "" expected result)
+  where
+    tv = [(1, ([ ],"a")),
+          (2, ([1],"a"))]
+    expected = M.fromList [(1, ([],"a"))]
+    result = runTest tv [1]
+
+simpleTest = TestCase (assertEqual "" expected result)
   where
     tv = [(1, ([2,3],"a")),
           (2, ([1,3],"a")),
@@ -52,7 +59,7 @@ simple = TestCase (assertEqual "" expected result)
     expected = M.fromList tv
     result = runTest tv [1]
 
-twoArgs = TestCase (assertEqual "" expected result)
+twoArgsTest = TestCase (assertEqual "" expected result)
   where
     tv = [(1, ([2,3],"a")),
           (2, ([1,3],"a")),
@@ -64,8 +71,10 @@ twoArgs = TestCase (assertEqual "" expected result)
     result = runTest tv [1, 6]
 
 
-tests = TestList [ empty
-                 , noArg
-                 , single
-                 , simple
-                 , twoArgs ]
+tests = TestList [ emptyTest
+                 , noArgTest
+                 , singleTest
+                 , simpleTest
+                 , noRouteTest
+                 , twoArgsTest
+                 ]

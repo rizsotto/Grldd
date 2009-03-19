@@ -1,4 +1,4 @@
-{- LANGUAGE ScopedTypeVariables -}
+{-# LANGUAGE ScopedTypeVariables #-}
 module Graph
         ( Moves
         , Map
@@ -11,9 +11,9 @@ module Graph
 import Ldd
 import Dpkg
 
-import qualified Data.Graph.Inductive.Graph as Graph
-import Data.Graph.Inductive.PatriciaTree (Gr)
-import Data.Graph.Inductive.Graphviz (graphviz')
+import qualified Data.Graph.Inductive.Graph as Graph (empty, mkGraph)
+import qualified Data.Graph.Inductive.PatriciaTree as Graph (Gr)
+import qualified Data.Graph.Inductive.Graphviz as Graph (graphviz')
 
 import qualified Data.Map as M
 
@@ -42,10 +42,8 @@ inspect :: [FilePath] -> IO (DepInfo)
 inspect fns = bfsM getInfo M.empty fns
 
 
----------- graph printing part (typed on FilePath, Maybe Package)
-type DepGraph = Data.Graph.Inductive.PatriciaTree.Gr String ()
-
-mkGraph' :: DepInfo -> DepGraph
+---------- graph printing part
+mkGraph' :: Ord a => Map a b -> Graph.Gr a ()
 mkGraph' deps =
     if M.null deps
         then Graph.empty 
@@ -58,4 +56,4 @@ mkGraph' deps =
                                ())) v) ++ acc) [] deps
 
 print' :: DepInfo -> IO ()
-print' = putStrLn . graphviz' . mkGraph'
+print' = putStrLn . Graph.graphviz' . mkGraph'
