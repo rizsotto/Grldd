@@ -8,7 +8,7 @@ Description:
 License:     GPL
 License-File: LICENSE
 Author:      Laszlo Nagy
-Maintainer:  rizsotto@gmail.com
+Maintainer:  Laszlo Nagy <rizsotto@gmail.com>
 Category:    System
 Stability:   Experimental
 Build-type:  Simple
@@ -29,8 +29,15 @@ Executable grldd
                         process,
                         containers
 
+Flag testing
+        Description:    Testing mode, build unit tests.
+        Default:        False
+
 Executable unit-test
-        Buildable:      False
+        if flag(testing)
+          Buildable:    True
+        else
+          Buildable:    False
         hs-source-dirs: Src Test
         Main-Is:        Test.hs
         other-modules:  GraphTest ParserTest 

@@ -18,7 +18,7 @@ options = [Option ['h'] ["help"] (NoArg Help) "Show this help message"]
 
 main = do
     handle
-        (\(e :: IOException) -> do 
+        (\e -> do 
                 dump ("grldd: failed " ++ show e)
                 exitWith (ExitFailure 1))
         (parseArgs >>= inspect >>= print' >> exitWith ExitSuccess)
