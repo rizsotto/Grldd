@@ -23,7 +23,7 @@ type Map a b = M.Map a ([a], b)
 
 bfsM :: (Monad m, Ord a) =>
         (a -> m (Moves a b)) -> Map a b -> [a] -> m (Map a b)
-bfsM f m []     = return m
+bfsM _ m []     = return m
 bfsM f m (x:xs) = do
     v@(ys,_) <- f x
     bfsM f (M.insert x v m) (xs ++ filter (`M.notMember` m) ys)

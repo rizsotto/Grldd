@@ -6,4 +6,4 @@ module Dpkg
 type Package = String
 
 getPackage :: FilePath -> IO (Maybe Package)
-getPackage fn = return Nothing
+getPackage _ = return Nothing

@@ -16,6 +16,7 @@ options :: [OptDescr Flag]
 options = [Option ['h'] ["help"] (NoArg Help) "Show this help message"]
 
 
+main :: IO ()
 main = do
     handle
         (\e -> do 
@@ -29,7 +30,6 @@ main = do
             case parse argv of
                         ([], [], [])     -> help
                         ([], files, [])  -> return files
-                        (opts, _, [])    -> help
                         (_,_,errs)       -> die errs
 
     parse      = getOpt Permute options

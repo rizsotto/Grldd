@@ -4,7 +4,7 @@ module Ldd
         ) where
 
 
-import System.IO (hGetContents, hClose)
+import System.IO (hGetContents)
 import System.Exit (ExitCode(..))
 import System.Process
 import Text.ParserCombinators.Parsec
@@ -74,13 +74,13 @@ entry =   do { string "statically linked"
              ; return ""
              }
         <|>
-          do { p <- try path 
+          do { _ <- try path 
              ; spaces
              ; address
              ; return ""
              }
         <|>
-          do { n <- filename
+          do { _ <- filename
              ; arrow
              ; do { p <- try path
                   ; spaces
@@ -99,8 +99,10 @@ line = do { spaces
           }
        <|> return ""
 
+eol :: Parser Char
 eol = char '\n'
 
+ldd :: Parser [FilePath]
 ldd = sepBy line eol
 
 parse' :: String -> String -> Either ParseError [FilePath]
