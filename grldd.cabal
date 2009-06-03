@@ -12,7 +12,7 @@ Maintainer:  Laszlo Nagy <rizsotto@gmail.com>
 Category:    System
 Stability:   Experimental
 Build-type:  Simple
-Cabal-Version: >= 1.2
+Cabal-Version: >= 1.6
 
 Executable grldd
         extensions:     ScopedTypeVariables
@@ -21,7 +21,7 @@ Executable grldd
         Main-Is:        Main.hs
         other-modules:  Graph Ldd Dpkg
 
-        Build-Depends:  base,
+        Build-Depends:  base == 4.*,
                         mtl,
                         parsec,
                         unix,

@@ -2,7 +2,6 @@ module Main where
 
 import Graph
 
-import Control.Exception
 import System.Environment (getArgs)
 import System.Exit
 import System.IO
@@ -18,11 +17,10 @@ options = [Option ['h'] ["help"] (NoArg Help) "Show this help message"]
 
 main :: IO ()
 main = do
-    handle
-        (\e -> do 
+    catch (parseArgs >>= inspect >>= print')
+          (\e -> do 
                 dump ("grldd: failed " ++ show e)
                 exitWith (ExitFailure 1))
-        (parseArgs >>= inspect >>= print' >> exitWith ExitSuccess)
   where
     parseArgs :: IO ([String])
     parseArgs = do
