@@ -1,5 +1,5 @@
 Name:        grldd
-Version:     0.4.2
+Version:     0.4.3
 Synopsis:    Recursive dependency printing tool
 Description:
         A simple recursive dependency printing tool for ELF objects.
