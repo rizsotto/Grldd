@@ -1,10 +1,14 @@
 module Main where
 
+import Test.HUnit (Test(..))
+
 import ParserTest (tests)
 import GraphTest  (tests)
 
 import Test.HUnit (runTestTT)
 
 main = do
-        runTestTT $ ParserTest.tests
-        runTestTT $ GraphTest.tests
+        runTestTT $ TestList
+			[ ParserTest.tests
+			, GraphTest.tests
+			]
