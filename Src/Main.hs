@@ -19,10 +19,12 @@ module Main where
 
 import Graph
 
+import Prelude hiding (catch)
 import System.Environment (getArgs)
 import System.Exit
 import System.IO
 import System.Console.GetOpt
+import Control.Exception
 
 
 data Flag = Help
@@ -35,9 +37,9 @@ options = [Option ['h'] ["help"] (NoArg Help) "Show this help message"]
 main :: IO ()
 main =
     catch (parseArgs >>= inspect >>= print')
-          (\e -> do 
-                dump ("grldd: failed " ++ show e)
-                exitWith (ExitFailure 1))
+          (\(e :: IOException) -> do
+                    dump ("grldd: failed " ++ show e)
+                    exitFailure)
   where
     parseArgs :: IO [String]
     parseArgs = do
