@@ -33,13 +33,13 @@ options = [Option ['h'] ["help"] (NoArg Help) "Show this help message"]
 
 
 main :: IO ()
-main = do
+main =
     catch (parseArgs >>= inspect >>= print')
           (\e -> do 
                 dump ("grldd: failed " ++ show e)
                 exitWith (ExitFailure 1))
   where
-    parseArgs :: IO ([String])
+    parseArgs :: IO [String]
     parseArgs = do
             argv <- getArgs
             case parse argv of
@@ -50,6 +50,6 @@ main = do
     parse      = getOpt Permute options
     header     = "Usage: grldd [-h] [file ...]"
     info       = usageInfo header options
-    die errs   = dump (concat errs ++ info) >> exitWith (ExitFailure 1)
-    help       = dump info                  >> exitWith ExitSuccess
+    die errs   = dump (concat errs ++ info) >> exitFailure
+    help       = dump info                  >> exitSuccess
     dump       = hPutStrLn stderr

@@ -55,7 +55,7 @@ getInfo fn = do
 
 type DepInfo = Map FilePath (Maybe Package)
 
-inspect :: [FilePath] -> IO (DepInfo)
+inspect :: [FilePath] -> IO DepInfo
 inspect = bfsM getInfo M.empty
 
 
@@ -66,11 +66,11 @@ mkGraph' deps =
         then Graph.empty 
         else Graph.mkGraph nodes edges
   where
-    nodes = M.foldrWithKey (\k _ acc -> ((M.findIndex k deps),k):acc) [] deps
+    nodes = M.foldrWithKey (\k _ acc -> (M.findIndex k deps, k):acc) [] deps
     edges = M.foldrWithKey (\k (v,_) acc ->
-                map (\dep -> ((M.findIndex k deps),
-                               (M.findIndex dep deps),
-                               ())) v ++ acc) [] deps
+                map (\dep -> (M.findIndex k deps,
+                              M.findIndex dep deps,
+                              ())) v ++ acc) [] deps
 
 print' :: DepInfo -> IO ()
 print' = putStrLn . Graph.graphviz' . mkGraph'

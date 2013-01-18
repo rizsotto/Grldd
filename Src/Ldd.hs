@@ -27,7 +27,7 @@ import System.Process
 import Text.ParserCombinators.Parsec
 
 ---------- dependency lookup with exec ldd
-getDependencies :: FilePath -> IO ([FilePath])
+getDependencies :: FilePath -> IO [FilePath]
 getDependencies fn = do
         (_, Just outh, Just errh, pid) <-
             createProcess (proc "ldd" [fn]) { std_out = CreatePipe
@@ -111,8 +111,7 @@ entry =   do { _ <- string "statically linked"
 
 line :: Parser FilePath
 line = do { spaces
-          ; e <- entry
-          ; return e
+          ; entry
           }
        <|> return ""
 
