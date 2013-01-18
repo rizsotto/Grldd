@@ -2,9 +2,9 @@ Name:        grldd
 Version:     0.4.3
 Synopsis:    Recursive dependency printing tool
 Description:
-        A simple recursive dependency printing tool for ELF objects.
-        Based on the GNU ldd command output. It generates graphviz dot
-	file as output.
+    A simple recursive dependency printing tool for ELF objects.
+    Based on the GNU ldd command output. It generates graphviz dot
+    file as output.
 License:     GPL
 License-File: LICENSE
 Author:      Laszlo Nagy
@@ -12,16 +12,15 @@ Maintainer:  Laszlo Nagy <rizsotto@gmail.com>
 Category:    System
 Stability:   Experimental
 Build-type:  Simple
-Cabal-Version: >= 1.6
+Cabal-Version: >= 1.9.2
 
 Executable grldd
         extensions:     ScopedTypeVariables
-        ghc-options:    -O2 -Wall
         hs-source-dirs: Src
         Main-Is:        Main.hs
         other-modules:  Graph Ldd Dpkg
 
-        Build-Depends:  base == 4.*,
+        Build-Depends:  base,
                         mtl,
                         parsec,
                         unix,
@@ -29,16 +28,17 @@ Executable grldd
                         process,
                         containers
 
-Flag testing
-        Description:    Testing mode, build unit tests.
-        Default:        False
-
-Executable unit-test
-        if flag(testing)
-          Buildable:    True
-        else
-          Buildable:    False
+Test-Suite unit-test
+        type:           exitcode-stdio-1.0
         hs-source-dirs: Src Test
         Main-Is:        Test.hs
         other-modules:  GraphTest ParserTest 
-        Build-Depends:  HUnit
+
+        Build-Depends:  base,
+                        mtl,
+                        parsec,
+                        unix,
+                        fgl,
+                        process,
+                        containers,
+                        HUnit
