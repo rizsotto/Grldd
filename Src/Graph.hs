@@ -49,8 +49,8 @@ mkGraph' deps =
         then Graph.empty 
         else Graph.mkGraph nodes edges
   where
-    nodes = M.foldWithKey (\k _ acc -> ((M.findIndex k deps),k):acc) [] deps
-    edges = M.foldWithKey (\k (v,_) acc ->
+    nodes = M.foldrWithKey (\k _ acc -> ((M.findIndex k deps),k):acc) [] deps
+    edges = M.foldrWithKey (\k (v,_) acc ->
                 map (\dep -> ((M.findIndex k deps),
                                (M.findIndex dep deps),
                                ())) v ++ acc) [] deps

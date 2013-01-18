@@ -34,16 +34,16 @@ getDependencies fn = do
 --    name => (address)
 
 hexadecimal :: Parser ()
-hexadecimal = do { char '0'
-                 ; char 'x'
-                 ; many1 hexDigit
+hexadecimal = do { _ <- char '0'
+                 ; _ <- char 'x'
+                 ; _ <- many1 hexDigit
                  ; return ()
                  }
 
 address :: Parser ()
-address = do { char '('
-             ; hexadecimal
-             ; char ')'
+address = do { _ <- char '('
+             ; _ <- hexadecimal
+             ; _ <- char ')'
              ; return ()
              }
 
@@ -57,20 +57,20 @@ separator :: Parser Char
 separator = char '/'
 
 path :: Parser String
-path = do { separator
+path = do { _ <- separator
           ; f <- sepBy filename separator
           ; return $ foldr (\w res -> '/' : w ++ res) "" f
           }
 
 arrow :: Parser ()
 arrow = do { spaces
-           ; string "=>"
+           ; _ <- string "=>"
            ; spaces
            ; return ()
            }
 
 entry :: Parser FilePath
-entry =   do { string "statically linked"
+entry =   do { _ <- string "statically linked"
              ; return ""
              }
         <|>
